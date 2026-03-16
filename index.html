@@ -1,0 +1,538 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fxgdf</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            background: #000;
+            color: white;
+        }
+        
+        .stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            transition: background-color 2s ease-in-out;
+            background: linear-gradient(135deg, #0c0c2e 0%, #1a1a4a 50%, #0c0c2e 100%);
+        }
+        
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle 5s infinite alternate;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        /* 月亮样式 - 固定满月，只做左右移动 */
+        .moon-container {
+            position: absolute;
+            top: 50px;
+            right: 50px;
+            width: 120px;
+            height: 120px;
+            z-index: 2;
+            animation: moonMove 20s ease-in-out infinite alternate;
+        }
+        
+        .moon {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #f5f3ce, #f0e68c);
+            box-shadow: 0 0 40px rgba(255, 255, 200, 0.8),
+                        0 0 80px rgba(255, 255, 200, 0.4),
+                        inset 10px 0 20px rgba(255, 255, 255, 0.5);
+        }
+        
+        /* 月亮左右移动动画 */
+        @keyframes moonMove {
+            0% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-50px);
+            }
+            50% {
+                transform: translateX(-100px);
+            }
+            75% {
+                transform: translateX(-50px);
+            }
+            100% {
+                transform: translateX(0);
+            }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .main-title {
+            font-size: 3.2rem;
+            margin-bottom: 40px;
+            background: linear-gradient(to right, #ff7e5f, #feb47b, #86a8e7, #91eae4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
+            letter-spacing: 2px;
+            font-weight: 800;
+        }
+        
+        .promo-links-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 20px;
+        }
+        
+        /* 胶囊按钮样式 - 调整尺寸为高100px，宽250px */
+        .promo-link {
+            width: 250px;
+            height: 100px;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            /* 胶囊型样式 - 高度的一半作为圆角半径 */
+            border-radius: 50px;
+            background: linear-gradient(45deg, #6a5acd, #836fff);
+            box-shadow: 0 10px 25px rgba(106, 90, 205, 0.5);
+        }
+        
+        .promo-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            /* 胶囊型圆角保持一致 */
+            border-radius: 50px;
+            z-index: 1;
+        }
+        
+        .promo-link:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(106, 90, 205, 0.7);
+        }
+        
+        .link-title {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+            z-index: 2;
+            line-height: 1.2;
+        }
+        
+        .link-desc {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            max-width: 90%;
+            line-height: 1.3;
+            z-index: 2;
+            padding: 0 10px;
+        }
+        
+        .fireworks-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 3;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .promo-links-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 25px;
+            }
+            
+            .main-title {
+                font-size: 2.8rem;
+            }
+            
+            .moon-container {
+                width: 90px;
+                height: 90px;
+                top: 30px;
+                right: 30px;
+            }
+            
+            @keyframes moonMove {
+                0% { transform: translateX(0); }
+                25% { transform: translateX(-30px); }
+                50% { transform: translateX(-60px); }
+                75% { transform: translateX(-30px); }
+                100% { transform: translateX(0); }
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .promo-links-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                width: 95%;
+            }
+            
+            .main-title {
+                font-size: 2.2rem;
+                margin-bottom: 30px;
+            }
+            
+            .moon-container {
+                width: 70px;
+                height: 70px;
+                top: 20px;
+                right: 20px;
+            }
+            
+            .promo-link {
+                width: 250px;
+                height: 100px;
+                margin: 0 auto;
+            }
+            
+            @keyframes moonMove {
+                0% { transform: translateX(0); }
+                25% { transform: translateX(-20px); }
+                50% { transform: translateX(-40px); }
+                75% { transform: translateX(-20px); }
+                100% { transform: translateX(0); }
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .promo-link {
+                width: 220px;
+                height: 90px;
+            }
+            
+            .link-title {
+                font-size: 1.2rem;
+            }
+            
+            .link-desc {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 星空背景容器 -->
+    <div class="stars-container" id="starsContainer"></div>
+    
+    <!-- 月亮容器 - 固定满月，只做左右移动 -->
+    <div class="moon-container">
+        <div class="moon"></div>
+    </div>
+    
+    <!-- 烟花画布 -->
+    <canvas class="fireworks-canvas" id="fireworksCanvas"></canvas>
+    
+    <!-- 主要内容 -->
+    <div class="container">
+        <h1 class="main-title">4K高清影院</h1>
+         
+       <div class="promo-links-container">
+            <a href="http://genfcvci.u.czxbw.com/s/15G6DS" class="promo-link" target="_blank">
+                <div class="link-title">🍆午夜激情在线网</div>
+                <div class="link-desc">网址7882c.cc</div>
+            </a>
+            
+            <a href="https://cdn.auoktalk.com/1765305207_9a98847a3077bb8d026152b20018639f?code=aubr96" class="promo-link" target="_blank">
+                <div class="link-title">🥭午夜激情在线网</div>
+                <div class="link-desc">网址7882c.cc</div>
+            </a>
+            
+            <a href="http://rk1.4u8.cn/rk1.html?u=bucket_6963c3bfb0d48" class="promo-link" target="_blank">
+                <div class="link-title">🍓午夜激情在线网</div>
+                <div class="link-desc">网址7882c.cc</div>
+            </a>
+            
+            <a href="https://media.dxhmt.cn/hjk/2025/07/16/1752666721344_20250716115201A567.html?atecode=MTAxLENmN1NJLDY" class="promo-link" target="_blank">
+                <div class="link-title">🍎午夜激情在线网</div>
+                <div class="link-desc">网址7882c.cc</div>
+            </a>
+           
+            <a href="http://C8n34.0118.jxyz.cn/7LnjXbJx/344?t=pages/wapredirect" class="promo-link" target="_blank">
+                <div class="link-title">🍊午夜激情在线网</div>
+                <div class="link-desc">网址7882c.cc</div>
+            </a>
+       
+       </div>
+    </div>
+    
+    <script>
+        // 获取DOM元素
+        const starsContainer = document.getElementById('starsContainer');
+        const fireworksCanvas = document.getElementById('fireworksCanvas');
+        const ctx = fireworksCanvas.getContext('2d');
+        const promoLinks = document.querySelectorAll('.promo-link');
+        
+        // 设置画布尺寸
+        fireworksCanvas.width = window.innerWidth;
+        fireworksCanvas.height = window.innerHeight;
+        
+        // 星空背景颜色数组
+        const bgColors = [
+            'linear-gradient(135deg, #0c0c2e 0%, #1a1a4a 50%, #0c0c2e 100%)',
+            'linear-gradient(135deg, #1a0b2e 0%, #2d1b69 50%, #1a0b2e 100%)',
+            'linear-gradient(135deg, #0b2e1a 0%, #1b693d 50%, #0b2e1a 100%)',
+            'linear-gradient(135deg, #2e0b0b 0%, #691b1b 50%, #2e0b0b 100%)',
+            'linear-gradient(135deg, #2e2b0b 0%, #69651b 50%, #2e2b0b 100%)',
+            'linear-gradient(135deg, #0b2e2e 0%, #1b6969 50%, #0b2e2e 100%)'
+        ];
+        
+        // 胶囊按钮统一颜色数组
+        const capsuleColors = [
+            {color1: '#6a5acd', color2: '#836fff'},
+            {color1: '#FF416C', color2: '#FF4B2B'},
+            {color1: '#38ef7d', color2: '#11998e'},
+            {color1: '#f7971e', color2: '#ffd200'},
+            {color1: '#4A00E0', color2: '#8E2DE2'},
+            {color1: '#00b09b', color2: '#96c93d'},
+            {color1: '#ff0084', color2: '#33001b'},
+            {color1: '#3a7bd5', color2: '#00d2ff'},
+            {color1: '#DA4453', color2: '#89216B'},
+            {color1: '#f46b45', color2: '#eea849'}
+        ];
+        
+        let currentColorIndex = 0;
+        
+        // 创建星星
+        function createStars() {
+            starsContainer.innerHTML = '';
+            const starCount = 300;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                const size = Math.random() * 3 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                star.style.animationDuration = `${Math.random() * 3 + 3}s`;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        // 烟花粒子数组
+        let fireworks = [];
+        
+        // 烟花粒子类
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.radius = Math.random() * 3 + 1;
+                this.speedX = Math.random() * 6 - 3;
+                this.speedY = Math.random() * 6 - 3;
+                this.alpha = 1;
+                this.decay = Math.random() * 0.015 + 0.005;
+            }
+            
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.alpha -= this.decay;
+            }
+            
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+        
+        // 创建烟花效果
+        function createFirework() {
+            const x = Math.random() * fireworksCanvas.width;
+            const y = Math.random() * fireworksCanvas.height;
+            
+            const currentColors = capsuleColors[currentColorIndex];
+            const color = currentColors.color1;
+            
+            const particleCount = 200;
+            for (let i = 0; i < particleCount; i++) {
+                fireworks.push(new Particle(x, y, color));
+            }
+        }
+        
+        // 动画循环
+        function animate() {
+            ctx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+            
+            for (let i = fireworks.length - 1; i >= 0; i--) {
+                fireworks[i].update();
+                fireworks[i].draw();
+                
+                if (fireworks[i].alpha <= 0) {
+                    fireworks.splice(i, 1);
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        }
+        
+        // 更新背景颜色
+        function updateBackground() {
+            const randomColor = bgColors[Math.floor(Math.random() * bgColors.length)];
+            starsContainer.style.background = randomColor;
+        }
+        
+        // 更新胶囊按钮颜色（统一颜色）
+        function updateCapsuleColors() {
+            const currentColors = capsuleColors[currentColorIndex];
+            const color1 = currentColors.color1;
+            const color2 = currentColors.color2;
+            
+            promoLinks.forEach(link => {
+                link.style.background = `linear-gradient(45deg, ${color1}, ${color2})`;
+                link.style.boxShadow = `0 10px 25px ${color1}80`;
+            });
+            
+            currentColorIndex = (currentColorIndex + 1) % capsuleColors.length;
+        }
+        
+        // 初始化函数
+        function init() {
+            // 初始化元素
+            createStars();
+            updateBackground();
+            updateCapsuleColors();
+            createFirework();
+            animate();
+            
+            // 设置定时器
+            setInterval(updateBackground, 30000);     // 30秒变换背景
+            setInterval(createFirework, 15000);       // 15秒播放烟花
+            setInterval(updateCapsuleColors, 5000);   // 5秒变换胶囊按钮颜色
+            
+            // 窗口大小调整
+            window.addEventListener('resize', function() {
+                fireworksCanvas.width = window.innerWidth;
+                fireworksCanvas.height = window.innerHeight;
+                createStars();
+            });
+            
+            // 按钮点击效果 - 修复链接跳转
+            promoLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // 保留默认的链接跳转行为
+                    // 不阻止事件传播，让链接正常工作
+                    
+                    // 只添加视觉效果，不影响链接跳转
+                    const originalTransform = this.style.transform;
+                    this.style.transform = 'translateY(-8px) scale(0.95)';
+                    
+                    // 波纹效果
+                    const ripple = document.createElement('div');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    
+                    ripple.style.position = 'absolute';
+                    ripple.style.width = ripple.style.height = `${size}px`;
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.background = 'rgba(255, 255, 255, 0.3)';
+                    ripple.style.transform = 'scale(0)';
+                    ripple.style.animation = 'ripple 0.6s linear';
+                    ripple.style.top = `${e.clientY - rect.top - size/2}px`;
+                    ripple.style.left = `${e.clientX - rect.left - size/2}px`;
+                    
+                    this.appendChild(ripple);
+                    
+                    // 移除波纹元素
+                    setTimeout(() => {
+                        ripple.remove();
+                        this.style.transform = originalTransform;
+                    }, 600);
+                    
+                    // 记录点击日志
+                    const linkTitle = this.querySelector('.link-title').textContent;
+                    console.log(`点击了: ${linkTitle}，将跳转到: ${this.href}`);
+                });
+            });
+        }
+        
+        // 添加波纹动画样式
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+            
+            @keyframes moonGlow {
+                0%, 100% { box-shadow: 0 0 40px rgba(255, 255, 200, 0.8),
+                                    0 0 80px rgba(255, 255, 200, 0.4),
+                                    inset 10px 0 20px rgba(255, 255, 255, 0.5); }
+                50% { box-shadow: 0 0 50px rgba(255, 255, 200, 0.9),
+                                0 0 100px rgba(255, 255, 200, 0.6),
+                                inset 10px 0 25px rgba(255, 255, 255, 0.7); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // 为月亮添加发光动画
+        document.querySelector('.moon').style.animation = 'moonGlow 4s infinite alternate';
+        
+        // 页面加载完成后初始化
+        window.onload = init;
+    </script>
+</body>
+</html>
